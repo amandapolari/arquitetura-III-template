@@ -1,11 +1,11 @@
 export interface ProductDB {
-  id: string,
-  name: string,
-  price: number,
-  created_at: string
+    id: string;
+    name: string;
+    price: number;
+    created_at: string;
 }
 
-export class Product {    
+export class Product {
     constructor(
         private id: string,
         private name: string,
@@ -14,34 +14,34 @@ export class Product {
     ) {}
 
     public getId(): string {
-        return this.id
+        return this.id;
     }
-    
+
     public setId(value: string): void {
-        this.id = value
+        this.id = value;
     }
 
     public getName(): string {
-        return this.name
+        return this.name;
     }
 
     public setName(value: string): void {
-        this.name = value
+        this.name = value;
     }
 
     public getPrice(): number {
-        return this.price
+        return this.price;
     }
 
     public setPrice(value: number): void {
-        this.price = value
+        this.price = value;
     }
 
     public getCreatedAt(): string {
-        return this.createdAt
+        return this.createdAt;
     }
 
     public setCreatedAt(value: string): void {
-        this.createdAt = value
+        this.createdAt = value;
     }
 }
