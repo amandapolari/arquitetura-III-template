@@ -1,33 +1,53 @@
 import { ProductDatabase } from '../database/ProductDatabase';
+import {
+    CreateProductInputDTO,
+    CreateProductOutputDTO,
+} from '../dtos/createProduct.dto';
+import {
+    DeleteProductInputDTO,
+    DeleteProductOutputDTO,
+} from '../dtos/deleteProduct.dto';
+import {
+    EditProductInputDTO,
+    EditProductOutputDTO,
+} from '../dtos/editProduct.dto';
+import {
+    GetProductsInputDTO,
+    GetProductsOutputDTO,
+} from '../dtos/getProducts.dto';
 import { BadRequestError } from '../errors/BadRequestError';
 import { NotFoundError } from '../errors/NotFoundError';
 import { Product, ProductDB } from '../models/Product';
 
 export class ProductBusiness {
-    public createProduct = async (input: any) => {
+    constructor(private productsDatabase: ProductDatabase) {}
+
+    public createProduct = async (
+        input: CreateProductInputDTO
+    ): Promise<CreateProductOutputDTO> => {
         const { id, name, price } = input;
 
-        if (typeof id !== 'string') {
-            throw new BadRequestError("'id' deve ser string");
-        }
+        // if (typeof id !== 'string') {
+        //     throw new BadRequestError("'id' deve ser string");
+        // }
 
-        if (typeof name !== 'string') {
-            throw new BadRequestError("'name' deve ser string");
-        }
+        // if (typeof name !== 'string') {
+        //     throw new BadRequestError("'name' deve ser string");
+        // }
 
-        if (typeof price !== 'number') {
-            throw new BadRequestError("'price' deve ser number");
-        }
+        // if (typeof price !== 'number') {
+        //     throw new BadRequestError("'price' deve ser number");
+        // }
 
-        if (name.length < 2) {
-            throw new BadRequestError(
-                "'name' deve possuir pelo menos 2 caracteres"
-            );
-        }
+        // if (name.length < 2) {
+        //     throw new BadRequestError(
+        //         "'name' deve possuir pelo menos 2 caracteres"
+        //     );
+        // }
 
-        if (price <= 0) {
-            throw new BadRequestError("'price' não pode ser zero ou negativo");
-        }
+        // if (price <= 0) {
+        //     throw new BadRequestError("'price' não pode ser zero ou negativo");
+        // }
 
         const productDatabase = new ProductDatabase();
         const productDBExists = await productDatabase.findProductById(id);
@@ -52,7 +72,7 @@ export class ProductBusiness {
 
         await productDatabase.insertProduct(newProductDB);
 
-        const output = {
+        const output: CreateProductOutputDTO = {
             message: 'Produto registrado com sucesso',
             product: {
                 id: newProduct.getId(),
@@ -65,11 +85,14 @@ export class ProductBusiness {
         return output;
     };
 
-    public getProducts = async (input: any) => {
+    public getProducts = async (
+        input: GetProductsInputDTO
+    ): Promise<GetProductsOutputDTO> => {
         const { q } = input;
 
-        const productDatabase = new ProductDatabase();
-        const productsDB = await productDatabase.findProducts(q);
+        // const productDatabase = new ProductDatabase();
+        // const productsDB = await productDatabase.findProducts(q);
+        const productsDB = await this.productsDatabase.findProducts(q);
 
         const products: Product[] = productsDB.map(
             (productDB) =>
@@ -81,51 +104,55 @@ export class ProductBusiness {
                 )
         );
 
-        const output = products.map((product) => ({
+        const output: GetProductsOutputDTO = products.map((product) => ({
             id: product.getId(),
             name: product.getName(),
             price: product.getPrice(),
-            created_at: product.getCreatedAt(),
+            createdAt: product.getCreatedAt(),
         }));
 
         return output;
     };
 
-    public editProduct = async (input: any) => {
+    public editProduct = async (
+        input: EditProductInputDTO
+    ): Promise<EditProductOutputDTO> => {
         const { idToEdit, id, name, price } = input;
 
-        if (id !== undefined) {
-            if (typeof id !== 'string') {
-                throw new BadRequestError("'id' deve ser string");
-            }
-        }
+        // if (id !== undefined) {
+        //     if (typeof id !== 'string') {
+        //         throw new BadRequestError("'id' deve ser string");
+        //     }
+        // }
 
-        if (name !== undefined) {
-            if (typeof name !== 'string') {
-                throw new BadRequestError("'name' deve ser string");
-            }
+        // if (name !== undefined) {
+        //     if (typeof name !== 'string') {
+        //         throw new BadRequestError("'name' deve ser string");
+        //     }
 
-            if (name.length < 2) {
-                throw new BadRequestError(
-                    "'name' deve possuir pelo menos 2 caracteres"
-                );
-            }
-        }
+        //     if (name.length < 2) {
+        //         throw new BadRequestError(
+        //             "'name' deve possuir pelo menos 2 caracteres"
+        //         );
+        //     }
+        // }
 
-        if (price !== undefined) {
-            if (typeof price !== 'number') {
-                throw new BadRequestError("'price' deve ser number");
-            }
+        // if (price !== undefined) {
+        //     if (typeof price !== 'number') {
+        //         throw new BadRequestError("'price' deve ser number");
+        //     }
 
-            if (price <= 0) {
-                throw new BadRequestError(
-                    "'price' não pode ser zero ou negativo"
-                );
-            }
-        }
+        //     if (price <= 0) {
+        //         throw new BadRequestError(
+        //             "'price' não pode ser zero ou negativo"
+        //         );
+        //     }
+        // }
 
-        const productDatabase = new ProductDatabase();
-        const productToEditDB = await productDatabase.findProductById(idToEdit);
+        // const productDatabase = new ProductDatabase();
+        const productToEditDB = await this.productsDatabase.findProductById(
+            idToEdit
+        );
 
         if (!productToEditDB) {
             throw new NotFoundError("'id' para editar não existe");
@@ -149,9 +176,9 @@ export class ProductBusiness {
             created_at: product.getCreatedAt(),
         };
 
-        await productDatabase.updateProduct(idToEdit, updatedProductDB);
+        await this.productsDatabase.updateProduct(idToEdit, updatedProductDB);
 
-        const output = {
+        const output: EditProductOutputDTO = {
             message: 'Produto editado com sucesso',
             product: {
                 id: product.getId(),
@@ -164,11 +191,14 @@ export class ProductBusiness {
         return output;
     };
 
-    public deleteProduct = async (input: any) => {
+    public deleteProduct = async (
+        input: DeleteProductInputDTO
+    ): Promise<DeleteProductOutputDTO> => {
         const { idToDelete } = input;
 
-        const productDatabase = new ProductDatabase();
-        const productToDeleteDB = await productDatabase.findProductById(
+        // const productDatabase = new ProductDatabase();
+        // const productToDeleteDB = await productDatabase.findProductById(
+        const productToDeleteDB = await this.productsDatabase.findProductById(
             idToDelete
         );
 
@@ -183,9 +213,10 @@ export class ProductBusiness {
             productToDeleteDB.created_at
         );
 
-        await productDatabase.deleteProductById(productToDeleteDB.id);
+        // await productDatabase.deleteProductById(productToDeleteDB.id);
+        await this.productsDatabase.deleteProductById(productToDeleteDB.id);
 
-        const output = {
+        const output: DeleteProductOutputDTO = {
             message: 'Produto deletado com sucesso',
             product: {
                 id: product.getId(),

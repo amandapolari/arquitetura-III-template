@@ -5,6 +5,14 @@ export interface ProductDB {
     created_at: string;
 }
 
+// é o modelo de Product que o front receberá (createdAt camelCase)
+export interface ProductModel {
+    id: string,
+    name: string,
+    price: number,
+    createdAt: string
+  }
+
 export class Product {
     constructor(
         private id: string,
